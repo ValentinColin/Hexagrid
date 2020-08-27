@@ -41,34 +41,40 @@ class Hexagon:
         )
 
     @property
-    def lower_radius(self):
-        c = self.center
-        return c[0]
+    def upper_radius(self):
+        xc, yc = self.center
+        xp, yp = self.points[0]
+        return math.sqrt((xp-xc)**2 + (yp-yc)**2)
 
     @property
-    def upper_radius(self):
-        pass
+    def lower_radius(self):
+        xc, yc = self.center
+        xp, yp = self.points[0]
+        step = self.upper_radius * math.cos(30*math.pi/180)
+        return step
 
     def __contains__(self, point):
         """Check if a polygon contains a point."""
-        x, y = point
-        return 
+        xc, yc = self.center
+        xp, yp = point
+        return math.sqrt((xc-xp)**2+(yc-yp)**2) <= self.lower_radius
 
 
 class Simulation:
     """Main class for the simulation."""
 
-    def __init__(self, size=(1000, 800)):
+    def __init__(self, size=(1000, 800), layers=5):
         """Create the window the pygame."""
         self.size = size
+        self.layers = layers
         self.screen = pygame.display.set_mode(size)
         pygame.display.set_caption("Hexagones")
         pygame.display.flip()
-        self.min = 5
-        self.max = 9
         self.hexagons = []
         self.loop = True
-        self.layers= 5
+        self.on = False
+        self.hexagons = self.generate_by_turning_arround()
+
 
     @property
     def w(self):
@@ -81,10 +87,9 @@ class Simulation:
     def main(self):
         """Start the whole program."""
         while self.loop:
-            self.update()
+            if self.on: self.update()
             self.loop_events()
             self.show()
-
 
     def loop_events(self):
         """For clicking maybe."""
@@ -94,27 +99,25 @@ class Simulation:
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
                     self.loop = False
-                if event.key == pygame.K_UP:
+                elif event.key == pygame.K_UP:
+                    self.hexagons = self.generate_by_turning_arround()
                     self.layers += 1
-                if event.key == pygame.K_DOWN:
+                elif event.key == pygame.K_DOWN:
+                    self.hexagons = self.generate_by_turning_arround()
                     if self.layers > 1:
                         self.layers -= 1
-                if event.key == pygame.K_d:
+                elif event.key == pygame.K_p:
                     print(self.layers)
-
-            elif event.type == pygame.MOUSEMOTION:
-                # event.mouse
-                # self.check_hover(event.x, event.y)
-                pass
+                elif event.key == pygame.K_SPACE:
+                    self.on = not self.on
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                self.check_hover(event.pos)
     
-    def check_hover(self, x, y):
+    def check_hover(self, position):
         """Check if a polygon is being hovered."""
-        for polygon in self.polygons:
-            if (x, y) in polygon:
-                polygon.alive = True
-            else:
-                polygon.alive = False
-    
+        for hexagon in self.hexagons:
+            if position in hexagon:
+                hexagon.alive = not hexagon.alive
 
     def generate_by_turning_arround(self):
         """Generate the list of hexagons."""
@@ -162,14 +165,40 @@ class Simulation:
 
     def update(self):
         """Update the simulation one step up."""
-        self.hexagons = self.generate_by_turning_arround()
+        for h1 in self.hexagons:
+            count = 0
+            for h2 in self.hexagons:
+                if self.is_neighbour(h1, h2):
+                    if h2.alive:
+                        count += 1
+            if count >= 3:
+                h1.alive = True
+
+    def is_neighbour(self, h1, h2):
+        """Are h1 and h2 neighbours? so is the question."""
+        x1, y1 = h1.center
+        x2, y2 = h2.center
+        return math.sqrt((x1-x2)**2 + (y1-y2)**2) <= h1.lower_radius + h2.lower_radius
 
     def show(self):
         """Show the simulation at a given step."""
         self.screen.fill(Colors.black)
+        self.show_update()
+        pygame.display.flip()
+
+    def show_update(self):
+        """Show if the simulation is on or off."""
+        font = pygame.font.Font('freesansbold.ttf', 32)
+        text = font.render('GeeksForGeeks', True, green, blue)
+        textRect = text.get_rect()
+
+
+
+    def show_hexagons(self):
+        """Show all hexagons."""
         for hexagon in self.hexagons:
             hexagon.show(self.screen)
-        pygame.display.flip()
+
 
     def make_hexagon(self, x, y, radius):
         """Create an hexagon given its position in pixels and its radius."""
