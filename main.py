@@ -8,7 +8,10 @@ class Colors:
     """Namespace for colors."""
     white = (255, 255, 255)
     black = (0, 0, 0)
-    grey = (127, 127, 127)
+    grey  = (127, 127, 127)
+    red   = (255,0,0)
+    green = (0,255,0)
+    blue  = (0,0,255)
 
 
 class Hexagon:
@@ -48,10 +51,7 @@ class Hexagon:
 
     @property
     def lower_radius(self):
-        xc, yc = self.center
-        xp, yp = self.points[0]
-        step = self.upper_radius * math.cos(30*math.pi/180)
-        return step
+        return self.upper_radius * math.cos(math.pi/6) # cos(30 degree)
 
     def __contains__(self, point):
         """Check if a polygon contains a point."""
@@ -74,7 +74,6 @@ class Simulation:
         self.loop = True
         self.on = False
         self.hexagons = self.generate_by_turning_arround()
-
 
     @property
     def w(self):
@@ -106,6 +105,12 @@ class Simulation:
                     self.hexagons = self.generate_by_turning_arround()
                     if self.layers > 1:
                         self.layers -= 1
+                elif event.key == pygame.K_RIGHT:
+                    self.update()
+                    self.show()
+                elif event.key == pygame.K_LEFT:
+                    self.update()
+                    self.show()
                 elif event.key == pygame.K_p:
                     print(self.layers)
                 elif event.key == pygame.K_SPACE:
@@ -140,7 +145,7 @@ class Simulation:
             x += step
 
             for ai in range(6):
-                a = 120 + ai*60
+                a = 120 + ai * 60
 
                 for n in range(nb_turns):
                     x += step*math.cos(a*math.pi/180)
@@ -183,16 +188,16 @@ class Simulation:
     def show(self):
         """Show the simulation at a given step."""
         self.screen.fill(Colors.black)
+        self.show_hexagons()
         self.show_update()
         pygame.display.flip()
 
     def show_update(self):
         """Show if the simulation is on or off."""
         font = pygame.font.Font('freesansbold.ttf', 32)
-        text = font.render('GeeksForGeeks', True, green, blue)
+        text = font.render('GeeksForGeeks', True, Colors.green, Colors.blue)
         textRect = text.get_rect()
-
-
+        pass
 
     def show_hexagons(self):
         """Show all hexagons."""
@@ -200,13 +205,12 @@ class Simulation:
             hexagon.show(self.screen)
 
 
-    def make_hexagon(self, x, y, radius):
+    def make_hexagon(self, x, y, radius, phase = math.pi/2):
         """Create an hexagon given its position in pixels and its radius."""
-        phase = math.pi/2
         points = []
         for a in range(6):
             points.append((
-                int(x + radius * math.cos(a*60*math.pi/180+phase)),
+                int(x + radius * math.cos(a*60*math.pi/180+phase)) ,
                 int(y + radius * math.sin(a*60*math.pi/180+phase))
                 ))
         return Hexagon(points)
@@ -215,3 +219,11 @@ class Simulation:
 if __name__ == "__main__":
     simulation = Simulation()
     simulation.main()
+
+
+
+
+
+
+
+
