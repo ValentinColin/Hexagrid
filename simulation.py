@@ -139,7 +139,7 @@ class Simulation:
         """Show the simulation at a given step."""
         self.screen.fill(Colors.black)
         self.show_hexagons()
-        self.show_text_on_or_off()
+        # self.show_text_on_or_off()
         pygame.display.flip()
 
     def show_text_on_or_off(self):

@@ -1,3 +1,5 @@
+import pygame
+
 from colors import Colors
 
 
