@@ -10,7 +10,7 @@ class Simulation:
     def __init__(self, size=(1000, 800), layers=5):
         """Create the window the pygame."""
         self.layers = layers
-        self.screen = pygame.display.set_mode(size)
+        self.screen = pygame.display.set_mode(size, pygame.RESIZABLE)
         pygame.display.set_caption("Hexagones")
         pygame.display.flip()
         self.hexagons = []
@@ -65,8 +65,10 @@ class Simulation:
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 self.check_hover(event.pos)
             elif event.type == pygame.VIDEORESIZE:
-                self.screen = pygame.display.set_mode((event.w, event.h),
-                                              pygame.RESIZABLE)
+                self.screen = pygame.display.set_mode(
+                    (event.w, event.h),
+                    pygame.RESIZABLE
+                )
     
     def check_hover(self, position):
         """Check if a polygon is being hovered."""
@@ -76,34 +78,42 @@ class Simulation:
 
     def generate_by_turning_arround(self):
         """Generate the list of hexagons."""
-        l = min(self.w, self.h)
-        d = self.layers*2
-        s = int(l / d / 2)
+        # length of the biggest square that can fit in the window
+        l = min(self.w, self.h) 
+        radius = int(l / self.layers / 4)
+
+        # compute the steps to take between each hexagon draw
+        step = 2 * radius * math.cos(30*math.pi/180)
+
+        # and start storing hexagons in a list starting from the middle one 
         x, y = self.w/2, self.h/2
 
-        hexagons = []
+        hexagons = [
+            self.make_hexagon(x,y,radius)
+        ]
 
-        radius = l/d
-        step = radius * math.cos(30*math.pi/180)
-
-        hexagons.append(
-            self.make_hexagon(x,y,radius/2)
-        )
-
+        # for each turn in spiral around the middle
         for nb_turns in range(1, self.layers):
 
+            # make one step right
             x += step
 
-            for ai in range(6):
-                a = 120 + ai * 60
+            # then turn around the middle by rotating 6 times
+            for rotation in range(6):
+                angle = 120 + rotation * 60
 
+                # and for each rotation make as many steps as the
+                # current number of turn
                 for n in range(nb_turns):
-                    x += step*math.cos(a*math.pi/180)
-                    y += step*math.sin(a*math.pi/180)
+                    x += step*math.cos(angle*math.pi/180)
+                    y += step*math.sin(angle*math.pi/180)
 
-                    if ai != 6:
+                    # and of course add the generated hexagon to the list
+                    # while making sure there are no duplicates at
+                    # the end of the turn
+                    if rotation != 6: 
                         hexagons.append(
-                            self.make_hexagon(x,y,s)
+                            self.make_hexagon(x,y,radius)
                         )
                 
         return hexagons
@@ -116,7 +126,6 @@ class Simulation:
         x = int(xr*l/d+self.w/2)
         y = int(yr*l/d+self.h/2)
         return self.make_hexagon(x, y, s)
-
 
     def update(self):
         """Update the simulation one step up."""
