@@ -7,7 +7,7 @@ from colors import Colors
 class Simulation:
     """Main class for the simulation."""
 
-    def __init__(self, size=(1000, 800), layers=5):
+    def __init__(self, size=(800, 800), layers=5):
         """Create the window the pygame."""
         self.layers = layers
         self.screen = pygame.display.set_mode(size, pygame.RESIZABLE)
@@ -16,7 +16,8 @@ class Simulation:
         self.hexagons = []
         self.loop = True
         self.on = False
-        self.hexagons = self.generate_by_turning_arround()
+        # self.hexagons = self.generate_by_turning_arround()
+        self.hexagons = self.generate_rectangle()
 
     @property
     def size(self):
@@ -63,27 +64,79 @@ class Simulation:
                 elif event.key == pygame.K_SPACE:
                     self.on = not self.on
             elif event.type == pygame.MOUSEBUTTONDOWN:
-                self.check_hover(event.pos)
+                self.click(event.pos)
             elif event.type == pygame.VIDEORESIZE:
                 self.screen = pygame.display.set_mode(
                     (event.w, event.h),
                     pygame.RESIZABLE
                 )
     
-    def check_hover(self, position):
+    def click(self, position):
         """Check if a polygon is being hovered."""
         for hexagon in self.hexagons:
             if position in hexagon:
                 hexagon.alive = not hexagon.alive
 
+    def generate_rectangle(self):
+        """Generate a square of hexagons in hexagonal space."""
+        l = min(self.w, self.h)
+
+        l/=2
+
+
+        h = math.sqrt(3)/2
+
+        w_rec = 6
+        h_rec = 10
+
+        l_rec = max(w_rec, h_rec)
+
+
+        step = int(l / 2 / l_rec)
+        radius = step / h
+
+        hexagons = []
+
+        for x_rec in range(w_rec):
+            for y_rec in range(h_rec):
+                print(x_rec, y_rec)
+                x = x_rec / l_rec
+                y = y_rec / l_rec
+                
+                print(x,y)
+
+                x, y = self.hexagonal_to_cartesian(x, y)
+
+                print(x,y)
+
+                u = l/l_rec
+
+                x *= l
+                y *= l
+
+                print(x,y)
+
+                x += self.w/2 - l/2
+                y += self.h/2 - l/2
+
+                y = self.h - y
+
+                print(x,y)
+
+                print()
+
+                hexagons.append(self.make_hexagon(x, y, radius))
+        return hexagons
+
     def generate_by_turning_arround(self):
-        """Generate the list of hexagons."""
+        """Generate the list of hexagons by ordering them in spiral."""
         # length of the biggest square that can fit in the window
         l = min(self.w, self.h) 
         radius = int(l / self.layers / 4)
 
         # compute the steps to take between each hexagon draw
-        step = 2 * radius * math.cos(30*math.pi/180)
+        center_to_edge= radius * math.cos(30*math.pi/180)
+        step = 2 *  center_to_edge
 
         # and start storing hexagons in a list starting from the middle one 
         x, y = self.w/2, self.h/2
@@ -118,27 +171,18 @@ class Simulation:
                 
         return hexagons
     
-    def draw_one(self, xr, yr):
-        """Relative positions."""
-        l = min(self.w, self.h)
-        d = self.max - self.min
-        s = int(l / d / 2)
-        x = int(xr*l/d+self.w/2)
-        y = int(yr*l/d+self.h/2)
-        return self.make_hexagon(x, y, s)
-
     def update(self):
         """Update the simulation one step up."""
         for h1 in self.hexagons:
             count = 0
             for h2 in self.hexagons:
-                if self.is_neighbour(h1, h2):
+                if self.are_neighbours(h1, h2):
                     if h2.alive:
                         count += 1
             if count >= 3:
                 h1.alive = True
 
-    def is_neighbour(self, h1, h2):
+    def are_neighbours(self, h1, h2):
         """Are h1 and h2 neighbours? so is the question."""
         x1, y1 = h1.center
         x2, y2 = h2.center
@@ -173,6 +217,27 @@ class Simulation:
                 int(y + radius * math.sin(a*60*math.pi/180+phase))
                 ))
         return Hexagon(points)
+
+
+    def cartesian_to_hexagonal(self, x, y):
+        """https://cdn.discordapp.com/attachments/729992302575091718/750448489304948916/IMG_20200901_221213.jpg
+        Deal with it.
+        x1, y1 = (math.cos(-math.pi/4), math.sin(-math.pi/4))
+        x2, y2 = (0, 1)
+
+        return (
+            x1*x + y1*y
+            x2*x + y2*y
+        )"""
+        # return (x*(math.sqrt(3)/2), y - x/2)
+        return (x - y/2, y*(math.sqrt(3)/2))
+
+    def hexagonal_to_cartesian(self, x, y):
+        # x_ = x/(math.sqrt(3)/2)
+        h = math.sqrt(3)/2
+        y_ = y * h 
+        # return (x_, y+x_/2)
+        return (x + y/2, y_)
 
 if __name__ == "__main__":
     pygame.init()
