@@ -16,8 +16,7 @@ class Simulation:
         self.hexagons = []
         self.loop = True
         self.on = False
-        # self.hexagons = self.generate_by_turning_arround()
-        self.hexagons = self.generate_rectangle()
+        self.hexagons = self.generate()
 
     @property
     def size(self):
@@ -47,10 +46,10 @@ class Simulation:
                 if event.key == pygame.K_ESCAPE:
                     self.loop = False
                 elif event.key == pygame.K_UP:
-                    self.hexagons = self.generate_by_turning_arround()
+                    self.hexagons = self.generate()
                     self.layers += 1
                 elif event.key == pygame.K_DOWN:
-                    self.hexagons = self.generate_by_turning_arround()
+                    self.hexagons = self.generate()
                     if self.layers > 1:
                         self.layers -= 1
                 elif event.key == pygame.K_RIGHT:
@@ -77,17 +76,24 @@ class Simulation:
             if position in hexagon:
                 hexagon.alive = not hexagon.alive
 
+    def generate(self):
+        return self.generate_rectangle()
+
     def generate_rectangle(self):
         """Generate a square of hexagons in hexagonal space."""
+
+        # No one will ever understand this code
         l = min(self.w, self.h)
 
-        l/=2
+        
 
 
         h = math.sqrt(3)/2
 
-        w_rec = 6
-        h_rec = 10
+        layers = 2 * self.layers - 1
+
+        w_rec = layers
+        h_rec = layers
 
         l_rec = max(w_rec, h_rec)
 
@@ -97,32 +103,27 @@ class Simulation:
 
         hexagons = []
 
-        for x_rec in range(w_rec):
-            for y_rec in range(h_rec):
-                print(x_rec, y_rec)
+        for layer in range(layers):
+            y_rec = layer - layers//2
+            d1 = max(-layer, -(layers//2))
+            d2 = min(layers//2, layers-layer-1)
+            for x_rec in range(d1, d2+1):
+
+                #print(x_rec, y_rec)
                 x = x_rec / l_rec
                 y = y_rec / l_rec
                 
-                print(x,y)
-
                 x, y = self.hexagonal_to_cartesian(x, y)
-
-                print(x,y)
 
                 u = l/l_rec
 
                 x *= l
                 y *= l
 
-                print(x,y)
-
-                x += self.w/2 - l/2
-                y += self.h/2 - l/2
+                x += self.w/2
+                y += self.h/2
 
                 y = self.h - y
-
-                print(x,y)
-
                 print()
 
                 hexagons.append(self.make_hexagon(x, y, radius))
@@ -233,10 +234,9 @@ class Simulation:
         return (x - y/2, y*(math.sqrt(3)/2))
 
     def hexagonal_to_cartesian(self, x, y):
-        # x_ = x/(math.sqrt(3)/2)
+        """Conversion from hexagonal space to cartesian space."""
         h = math.sqrt(3)/2
         y_ = y * h 
-        # return (x_, y+x_/2)
         return (x + y/2, y_)
 
 if __name__ == "__main__":
