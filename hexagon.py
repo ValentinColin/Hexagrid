@@ -35,12 +35,14 @@ class Hexagon:
 
     @property
     def upper_radius(self):
+        """Return the radius of the smallest circle that contains the hexagon."""
         xc, yc = self.center
         xp, yp = self.points[0]
         return math.sqrt((xp-xc)**2 + (yp-yc)**2)
 
     @property
     def lower_radius(self):
+        """Return the radius of the bigest circle contained in the hexagone."""
         return self.upper_radius * math.cos(math.pi/6) # cos(30 degree)
 
     def __contains__(self, point):
