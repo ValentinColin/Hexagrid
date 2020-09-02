@@ -25,7 +25,7 @@ class Simulation:
     @property
     def w(self):
         return self.size[0]
-    
+
     @property
     def h(self):
         return self.size[1]
@@ -46,12 +46,12 @@ class Simulation:
                 if event.key == pygame.K_ESCAPE:
                     self.loop = False
                 elif event.key == pygame.K_UP:
-                    self.hexagons = self.generate()
                     self.layers += 1
-                elif event.key == pygame.K_DOWN:
                     self.hexagons = self.generate()
+                elif event.key == pygame.K_DOWN:
                     if self.layers > 1:
                         self.layers -= 1
+                    self.hexagons = self.generate()
                 elif event.key == pygame.K_RIGHT:
                     self.update()
                     self.show()
@@ -69,7 +69,7 @@ class Simulation:
                     (event.w, event.h),
                     pygame.RESIZABLE
                 )
-    
+
     def click(self, position):
         """Check if a polygon is being hovered."""
         for hexagon in self.hexagons:
@@ -85,7 +85,7 @@ class Simulation:
         # No one will ever understand this code
         l = min(self.w, self.h)
 
-        
+
 
 
         h = math.sqrt(3)/2
@@ -112,7 +112,7 @@ class Simulation:
                 #print(x_rec, y_rec)
                 x = x_rec / l_rec
                 y = y_rec / l_rec
-                
+
                 x, y = self.hexagonal_to_cartesian(x, y)
 
                 u = l/l_rec
@@ -132,14 +132,14 @@ class Simulation:
     def generate_by_turning_arround(self):
         """Generate the list of hexagons by ordering them in spiral."""
         # length of the biggest square that can fit in the window
-        l = min(self.w, self.h) 
+        l = min(self.w, self.h)
         radius = int(l / self.layers / 4)
 
         # compute the steps to take between each hexagon draw
         center_to_edge= radius * math.cos(30*math.pi/180)
         step = 2 *  center_to_edge
 
-        # and start storing hexagons in a list starting from the middle one 
+        # and start storing hexagons in a list starting from the middle one
         x, y = self.w/2, self.h/2
 
         hexagons = [
@@ -165,13 +165,13 @@ class Simulation:
                     # and of course add the generated hexagon to the list
                     # while making sure there are no duplicates at
                     # the end of the turn
-                    if rotation != 6: 
+                    if rotation != 6:
                         hexagons.append(
                             self.make_hexagon(x,y,radius)
                         )
-                
+
         return hexagons
-    
+
     def update(self):
         """Update the simulation one step up."""
         for h1 in self.hexagons:
@@ -236,7 +236,7 @@ class Simulation:
     def hexagonal_to_cartesian(self, x, y):
         """Conversion from hexagonal space to cartesian space."""
         h = math.sqrt(3)/2
-        y_ = y * h 
+        y_ = y * h
         return (x + y/2, y_)
 
 if __name__ == "__main__":
