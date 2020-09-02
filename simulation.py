@@ -56,7 +56,7 @@ class Simulation:
                     self.update()
                     self.show()
                 elif event.key == pygame.K_LEFT:
-                    self.update()
+                    # ...Show the previous state of the grid...
                     self.show()
                 elif event.key == pygame.K_p:
                     print(self.layers)
