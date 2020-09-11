@@ -24,11 +24,11 @@ class Simulation:
 
     @property
     def w(self):
-        return self.size[0]
+        return self.screen.get_size()[0]
 
     @property
     def h(self):
-        return self.size[1]
+        return self.screen.get_size()[1]
 
     def main(self):
         """Start the whole program."""
@@ -60,6 +60,15 @@ class Simulation:
                     self.show()
                 elif event.key == pygame.K_p:
                     print(self.layers)
+                elif event.key == pygame.K_r:
+                    self.reset()
+
+                # debug
+                elif event.key == pygame.K_s:
+                    for h in self.hexagons:
+                        print("id:",h.id," -> state:",h.alive)
+                    print("\n\n\n")
+
                 elif event.key == pygame.K_SPACE:
                     self.on = not self.on
             elif event.type == pygame.MOUSEBUTTONDOWN:
@@ -78,6 +87,7 @@ class Simulation:
 
     def generate(self):
         return self.generate_rectangle()
+        # return self.generate_by_turning_arround()
 
     def generate_rectangle(self):
         """Generate a square of hexagons in hexagonal space."""
@@ -174,20 +184,30 @@ class Simulation:
 
     def update(self):
         """Update the simulation one step up."""
+        list_update = []
         for h1 in self.hexagons:
+            #print("----- Je regarde l'hexa d'id:",h1.id,"-----")
             count = 0
             for h2 in self.hexagons:
-                if self.are_neighbours(h1, h2):
-                    if h2.alive:
-                        count += 1
+                if h1 != h2:
+                    #print("test voisins entre",h1.id,"et",h2.id,"=",self.are_neighbours(h1, h2))
+                    if self.are_neighbours(h1, h2): # ne rentre jamais dans la condition
+                        if h2.alive:
+                            count += 1
+                    #print("count (id?:",h2.id,") :",count)
             if count >= 3:
-                h1.alive = True
+                list_update.append(h1)
+        for h in list_update:
+            h.alive = True
+        #print("\n\n")
 
     def are_neighbours(self, h1, h2):
         """Are h1 and h2 neighbours? so is the question."""
         x1, y1 = h1.center
         x2, y2 = h2.center
-        return math.sqrt((x1-x2)**2 + (y1-y2)**2) <= h1.lower_radius + h2.lower_radius
+        # ATTENTION: test d'inégalité sur des flottant !!!!
+        # J'ai donc pris le upper_radius pour être tranquille
+        return math.sqrt((x1-x2)**2 + (y1-y2)**2) <= (h1.upper_radius + h2.upper_radius)
 
     def show(self):
         """Show the simulation at a given step."""
@@ -195,6 +215,11 @@ class Simulation:
         self.show_hexagons()
         # self.show_text_on_or_off()
         pygame.display.flip()
+
+    def reset(self):
+        """Reset all the hexagones (all will be dead)"""
+        for h in self.hexagons:
+            h.alive = False
 
     def show_text_on_or_off(self):
         """Show if the simulation is on or off."""

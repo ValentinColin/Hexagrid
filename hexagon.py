@@ -7,15 +7,23 @@ from colors import Colors
 class Hexagon:
     """An hexagon that can be alive or dead."""
     width = 1
+    _nb_hexa = 0
+    _id = 0
 
     def __init__(self, points, alive=False):
         """Create a hexagon alive or dead."""
         self.points = points
         self.alive = alive
 
+        Hexagon._nb_hexa += 1
+        Hexagon._id      += 1
+        self.id = Hexagon._id
+
+
     @property
     def color(self):
-        """Return the color of the polygon."""
+        """Return the color of the polygon.
+        White = alive and Black = dead."""
         return (Colors.white if self.alive else Colors.black)
 
     def show(self, screen):
@@ -50,3 +58,10 @@ class Hexagon:
         xc, yc = self.center
         xp, yp = point
         return math.sqrt((xc-xp)**2+(yc-yp)**2) <= self.lower_radius
+
+    def __repr__(self):
+        """Return all the attribut of the hexegone"""
+        return "Information sur l'hexagone:\n" + str(self.__dict__)
+
+    def __del__(self):
+        Hexagon._nb_hexa -= 1
