@@ -213,7 +213,7 @@ class Simulation:
         """Show the simulation at a given step."""
         self.screen.fill(Colors.black)
         self.show_hexagons()
-        # self.show_text_on_or_off()
+        self.show_text_on_or_off()
         pygame.display.flip()
 
     def reset(self):
@@ -221,18 +221,19 @@ class Simulation:
         for h in self.hexagons:
             h.alive = False
 
-    def show_text_on_or_off(self):
+    def show_text_on_or_off(self): # à finir
         """Show if the simulation is on or off."""
-        font = pygame.font.Font('freesansbold.ttf', 32)
-        text = font.render('GeeksForGeeks', True, Colors.green, Colors.blue)
+        font = pygame.font.SysFont('freesansbold', 32)
+        if self.on:     text = font.render('On' , True, Colors.green)
+        else:           text = font.render('Off', True, Colors.red  )
         textRect = text.get_rect()
-        pass
+        textRect.centerx = 10
+        textRect.centery = 10
 
     def show_hexagons(self):
         """Show all hexagons."""
         for hexagon in self.hexagons:
             hexagon.show(self.screen)
-
 
     def make_hexagon(self, x, y, radius, phase = math.pi/2):
         """Create an hexagon given its position in pixels and its radius."""
@@ -243,7 +244,6 @@ class Simulation:
                 int(y + radius * math.sin(a*60*math.pi/180+phase))
                 ))
         return Hexagon(points)
-
 
     def cartesian_to_hexagonal(self, x, y):
         """https://cdn.discordapp.com/attachments/729992302575091718/750448489304948916/IMG_20200901_221213.jpg
