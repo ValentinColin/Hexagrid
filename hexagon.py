@@ -19,7 +19,6 @@ class Hexagon:
         Hexagon._id      += 1
         self.id = Hexagon._id
 
-
     @property
     def color(self):
         """Return the color of the polygon.

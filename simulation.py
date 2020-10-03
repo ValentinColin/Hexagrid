@@ -95,9 +95,6 @@ class Simulation:
         # No one will ever understand this code
         l = min(self.w, self.h)
 
-
-
-
         h = math.sqrt(3)/2
 
         layers = 2 * self.layers - 1
