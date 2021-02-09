@@ -6,6 +6,7 @@ from colors import Colors
 
 class Hexagon:
     """An hexagon that can be alive or dead."""
+
     width = 1
     _nb_hexa = 0
     _id = 0
@@ -16,14 +17,14 @@ class Hexagon:
         self.alive = alive
 
         Hexagon._nb_hexa += 1
-        Hexagon._id      += 1
+        Hexagon._id += 1
         self.id = Hexagon._id
 
     @property
     def color(self):
         """Return the color of the polygon.
         White = alive and Black = dead."""
-        return (Colors.white if self.alive else Colors.black)
+        return Colors.white if self.alive else Colors.black
 
     def show(self, screen):
         """Show the hexagon."""
@@ -35,28 +36,25 @@ class Hexagon:
         """Average of the points of the hexagon.
         Meaning its the center of the hexagon."""
         x_list, y_list = zip(*self.points)
-        return (
-            sum(x_list)/len(x_list),
-            sum(y_list)/len(y_list)
-        )
+        return (sum(x_list) / len(x_list), sum(y_list) / len(y_list))
 
     @property
     def upper_radius(self):
         """Return the radius of the smallest circle that contains the hexagon."""
         xc, yc = self.center
         xp, yp = self.points[0]
-        return math.sqrt((xp-xc)**2 + (yp-yc)**2)
+        return math.sqrt((xp - xc) ** 2 + (yp - yc) ** 2)
 
     @property
     def lower_radius(self):
         """Return the radius of the bigest circle contained in the hexagone."""
-        return self.upper_radius * math.cos(math.pi/6) # cos(30 degree)
+        return self.upper_radius * math.cos(math.pi / 6)  # cos(30 degree)
 
     def __contains__(self, point):
         """Check if a polygon contains a point."""
         xc, yc = self.center
         xp, yp = point
-        return math.sqrt((xc-xp)**2+(yc-yp)**2) <= self.lower_radius
+        return math.sqrt((xc - xp) ** 2 + (yc - yp) ** 2) <= self.lower_radius
 
     def __repr__(self):
         """Return all the attribut of the hexegone"""

@@ -4,6 +4,7 @@ import math
 from hexagon import Hexagon
 from colors import Colors
 
+
 class Simulation:
     """Main class for the simulation."""
 
@@ -33,7 +34,8 @@ class Simulation:
     def main(self):
         """Start the whole program."""
         while self.loop:
-            if self.on: self.update()
+            if self.on:
+                self.update()
             self.loop_events()
             self.show()
 
@@ -66,7 +68,7 @@ class Simulation:
                 # debug
                 elif event.key == pygame.K_s:
                     for h in self.hexagons:
-                        print("id:",h.id," -> state:",h.alive)
+                        print("id:", h.id, " -> state:", h.alive)
                     print("\n\n\n")
 
                 elif event.key == pygame.K_SPACE:
@@ -75,8 +77,7 @@ class Simulation:
                 self.click(event.pos)
             elif event.type == pygame.VIDEORESIZE:
                 self.screen = pygame.display.set_mode(
-                    (event.w, event.h),
-                    pygame.RESIZABLE
+                    (event.w, event.h), pygame.RESIZABLE
                 )
 
     def click(self, position):
@@ -95,7 +96,7 @@ class Simulation:
         # No one will ever understand this code
         l = min(self.w, self.h)
 
-        h = math.sqrt(3)/2
+        h = math.sqrt(3) / 2
 
         layers = 2 * self.layers - 1
 
@@ -104,31 +105,30 @@ class Simulation:
 
         l_rec = max(w_rec, h_rec)
 
-
         step = int(l / 2 / l_rec)
         radius = step / h
 
         hexagons = []
 
         for layer in range(layers):
-            y_rec = layer - layers//2
-            d1 = max(-layer, -(layers//2))
-            d2 = min(layers//2, layers-layer-1)
-            for x_rec in range(d1, d2+1):
+            y_rec = layer - layers // 2
+            d1 = max(-layer, -(layers // 2))
+            d2 = min(layers // 2, layers - layer - 1)
+            for x_rec in range(d1, d2 + 1):
 
-                #print(x_rec, y_rec)
+                # print(x_rec, y_rec)
                 x = x_rec / l_rec
                 y = y_rec / l_rec
 
                 x, y = self.hexagonal_to_cartesian(x, y)
 
-                u = l/l_rec
+                u = l / l_rec
 
                 x *= l
                 y *= l
 
-                x += self.w/2
-                y += self.h/2
+                x += self.w / 2
+                y += self.h / 2
 
                 y = self.h - y
                 print()
@@ -143,15 +143,13 @@ class Simulation:
         radius = int(l / self.layers / 4)
 
         # compute the steps to take between each hexagon draw
-        center_to_edge= radius * math.cos(30*math.pi/180)
-        step = 2 *  center_to_edge
+        center_to_edge = radius * math.cos(30 * math.pi / 180)
+        step = 2 * center_to_edge
 
         # and start storing hexagons in a list starting from the middle one
-        x, y = self.w/2, self.h/2
+        x, y = self.w / 2, self.h / 2
 
-        hexagons = [
-            self.make_hexagon(x,y,radius)
-        ]
+        hexagons = [self.make_hexagon(x, y, radius)]
 
         # for each turn in spiral around the middle
         for nb_turns in range(1, self.layers):
@@ -166,16 +164,14 @@ class Simulation:
                 # and for each rotation make as many steps as the
                 # current number of turn
                 for n in range(nb_turns):
-                    x += step*math.cos(angle*math.pi/180)
-                    y += step*math.sin(angle*math.pi/180)
+                    x += step * math.cos(angle * math.pi / 180)
+                    y += step * math.sin(angle * math.pi / 180)
 
                     # and of course add the generated hexagon to the list
                     # while making sure there are no duplicates at
                     # the end of the turn
                     if rotation != 6:
-                        hexagons.append(
-                            self.make_hexagon(x,y,radius)
-                        )
+                        hexagons.append(self.make_hexagon(x, y, radius))
 
         return hexagons
 
@@ -183,20 +179,22 @@ class Simulation:
         """Update the simulation one step up."""
         list_update = []
         for h1 in self.hexagons:
-            #print("----- Je regarde l'hexa d'id:",h1.id,"-----")
+            # print("----- Je regarde l'hexa d'id:",h1.id,"-----")
             count = 0
             for h2 in self.hexagons:
                 if h1 != h2:
-                    #print("test voisins entre",h1.id,"et",h2.id,"=",self.are_neighbours(h1, h2))
-                    if self.are_neighbours(h1, h2): # ne rentre jamais dans la condition
+                    # print("test voisins entre",h1.id,"et",h2.id,"=",self.are_neighbours(h1, h2))
+                    if self.are_neighbours(
+                        h1, h2
+                    ):  # ne rentre jamais dans la condition
                         if h2.alive:
                             count += 1
-                    #print("count (id?:",h2.id,") :",count)
+                    # print("count (id?:",h2.id,") :",count)
             if count >= 3:
                 list_update.append(h1)
         for h in list_update:
             h.alive = True
-        #print("\n\n")
+        # print("\n\n")
 
     def are_neighbours(self, h1, h2):
         """Are h1 and h2 neighbours? so is the question."""
@@ -204,7 +202,9 @@ class Simulation:
         x2, y2 = h2.center
         # ATTENTION: test d'inégalité sur des flottant !!!!
         # J'ai donc pris le upper_radius pour être tranquille
-        return math.sqrt((x1-x2)**2 + (y1-y2)**2) <= (h1.upper_radius + h2.upper_radius)
+        return math.sqrt((x1 - x2) ** 2 + (y1 - y2) ** 2) <= (
+            h1.upper_radius + h2.upper_radius
+        )
 
     def show(self):
         """Show the simulation at a given step."""
@@ -218,11 +218,13 @@ class Simulation:
         for h in self.hexagons:
             h.alive = False
 
-    def show_text_on_or_off(self): # à finir
+    def show_text_on_or_off(self):  # à finir
         """Show if the simulation is on or off."""
-        font = pygame.font.SysFont('freesansbold', 32)
-        if self.on:     text = font.render('On' , True, Colors.green)
-        else:           text = font.render('Off', True, Colors.red  )
+        font = pygame.font.SysFont("freesansbold", 32)
+        if self.on:
+            text = font.render("On", True, Colors.green)
+        else:
+            text = font.render("Off", True, Colors.red)
         textRect = text.get_rect()
         textRect.centerx = 10
         textRect.centery = 10
@@ -232,14 +234,16 @@ class Simulation:
         for hexagon in self.hexagons:
             hexagon.show(self.screen)
 
-    def make_hexagon(self, x, y, radius, phase = math.pi/2):
+    def make_hexagon(self, x, y, radius, phase=math.pi / 2):
         """Create an hexagon given its position in pixels and its radius."""
         points = []
         for a in range(6):
-            points.append((
-                int(x + radius * math.cos(a*60*math.pi/180+phase)) ,
-                int(y + radius * math.sin(a*60*math.pi/180+phase))
-                ))
+            points.append(
+                (
+                    int(x + radius * math.cos(a * 60 * math.pi / 180 + phase)),
+                    int(y + radius * math.sin(a * 60 * math.pi / 180 + phase)),
+                )
+            )
         return Hexagon(points)
 
     def cartesian_to_hexagonal(self, x, y):
@@ -253,13 +257,14 @@ class Simulation:
             x2*x + y2*y
         )"""
         # return (x*(math.sqrt(3)/2), y - x/2)
-        return (x - y/2, y*(math.sqrt(3)/2))
+        return (x - y / 2, y * (math.sqrt(3) / 2))
 
     def hexagonal_to_cartesian(self, x, y):
         """Conversion from hexagonal space to cartesian space."""
-        h = math.sqrt(3)/2
+        h = math.sqrt(3) / 2
         y_ = y * h
-        return (x + y/2, y_)
+        return (x + y / 2, y_)
+
 
 if __name__ == "__main__":
     pygame.init()
