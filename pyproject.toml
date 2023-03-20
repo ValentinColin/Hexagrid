@@ -1,0 +1,16 @@
+[tool.poetry]
+name = "hexagrid"
+version = "0.1.0"
+description = "A grid of hexagons in pygame"
+authors = ["Marc Partensky <marc.partensky@gmail.com>"]
+license = "GPL-2"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+pygame = "^2.3.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
